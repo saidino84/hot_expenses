@@ -37,6 +37,12 @@ dependencies:
   get: ^4.6.5
   dio: ^4.0.6
   drift_sqflite: ^2.0.0
+  firebase_core: ^2.3.0
+  firebase_storage: ^11.0.6
+  cloud_firestore: ^4.1.0
+  path_provider: ^2.0.11
+  flutter_svg: ^1.1.6
+  cached_network_image:
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hot_expenses/app/controllers/app_controller.dart';
@@ -28,9 +29,9 @@ class HomePage extends GetView<HomeController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                margin: EdgeInsets.only(top: 5, left: 10, right: 10),
                 padding: EdgeInsets.all(20),
-                height: size.height * 0.1,
+                height: size.height * 0.15,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   // color: Color.fromARGB(255, 236, 234, 228),
@@ -44,7 +45,7 @@ class HomePage extends GetView<HomeController> {
                       children: [
                         Text(
                           'Good Morning',
-                          style: TextStyle(color: Colors.grey),
+                          style: TextStyle(color: Colors.grey, fontSize: 10),
                         ),
                         Text(
                           'Home Expenses !',
@@ -60,8 +61,10 @@ class HomePage extends GetView<HomeController> {
                   ],
                 ),
               ),
+
+              // CARTAO DECREDITO OU DEBITO
               Container(
-                height: size.height * 0.23,
+                height: size.height * 0.2,
                 width: double.infinity,
                 decoration: BoxDecoration(
                     color: Colors.white,
@@ -168,23 +171,64 @@ class HomePage extends GetView<HomeController> {
                 child: Container(
                   margin: EdgeInsets.symmetric(vertical: 8.0),
                   width: double.infinity,
-                  child: ListView.builder(
-                      itemCount: 10,
-                      itemBuilder: (ctx, index) {
-                        return Obx(() {
-                          ExpenseModel expenseModel =
-                              controller.expenses.elementAt(index);
-                          return ExpenseItem(
-                            index: index,
-                            expenseModel: expenseModel,
-                          );
-                        });
-                      }),
+                  child: ExpeseListBuild(controller: controller),
                 ),
               ),
             ],
           ),
         ));
+  }
+}
+
+class ExpeseListBuild extends StatelessWidget {
+  const ExpeseListBuild({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  final HomeController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<ExpenseModel>>(
+        stream: controller.repository.expense_service.getExpenses_Stream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('${snapshot.error}'),
+            );
+          }
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              // TODO: Handle this case.
+              break;
+            case ConnectionState.waiting:
+              // TODO: Handle this case.
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+              break;
+            case ConnectionState.active:
+              List<ExpenseModel> expenses = snapshot.data!;
+              if (expenses.isNotEmpty) {
+                return ListView.builder(
+                    itemCount: expenses.length,
+                    itemBuilder: (ctx, index) {
+                      return ExpenseItem(
+                        index: index,
+                        expenseModel: expenses[index],
+                      );
+                    });
+              }
+              break;
+            case ConnectionState.done:
+              // TODO: Handle this case.
+              break;
+          }
+          return Center(
+            child: Text('_Home'),
+          );
+        });
   }
 }
 
@@ -199,6 +243,8 @@ class ExpenseItem extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     // ExpenseModel expenseModel = controller.expenses.value.elementAt(index);
+    DateTime data = DateTime.fromMicrosecondsSinceEpoch(
+        expenseModel.date!.microsecondsSinceEpoch);
     return Container(
       margin: EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -206,17 +252,21 @@ class ExpenseItem extends GetView<HomeController> {
       child: ListTile(
         title: Text("${expenseModel.title}"),
         leading: CircleAvatar(
-          backgroundColor: expenseModel.done
+          backgroundColor: expenseModel.done!
               ? Theme.of(context).primaryColor
               : Theme.of(context).secondaryHeaderColor,
           child: IconButton(
             onPressed: () => controller.update_expense(expenseModel),
             icon: Icon(
-              expenseModel.done ? Icons.done : Icons.power_settings_new_rounded,
+              expenseModel.done!
+                  ? Icons.done
+                  : Icons.power_settings_new_rounded,
             ),
           ),
         ),
-        subtitle: Text(expenseModel.date),
+        subtitle: Text(
+          ("${data.day}/${data.month}/${data.year}"),
+        ),
         trailing: Text("${expenseModel.amount}"),
       ),
     );
