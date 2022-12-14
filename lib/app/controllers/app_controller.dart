@@ -1,5 +1,6 @@
 import 'package:get/state_manager.dart';
 import 'package:hot_expenses/app/api_services/expense_service.dart';
+import 'package:hot_expenses/app/api_services/expense_service_real_db.dart';
 import 'package:hot_expenses/app/db/models/expense.dart';
 import 'package:hot_expenses/app/db/provider/expense_provider.dart';
 import 'package:hot_expenses/app/db/repository/expense_repository.dart';
@@ -23,7 +24,9 @@ class HomeController extends GetxController {
     print(expenseModel.done);
     expenseModel.done = expenseModel.done;
     expenses.refresh();
-    print(await expense_provider.get_simple_data());
+
+    ExpenseRealDbService.instance
+        .upload_expense_rdb(expenseModel: expenseModel);
     // update();
   }
 }
