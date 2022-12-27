@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:get/get.dart';
 import 'package:hot_expenses/app/api_services/expense_service.dart';
 import 'package:hot_expenses/app/db/models/expense.dart';
 

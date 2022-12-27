@@ -8,13 +8,20 @@ import '../../controllers/expense_controller.dart';
 class ExpenseUI extends GetView<ExpenseController> {
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     // TODO: implement build
-    return Container(
-      child: Column(
-        children: [
-          Text('Title'),
-          TextField(),
-        ],
+    return Scaffold(
+      body: Container(
+        height: size.height * 0.5,
+        child: Column(
+          children: [
+            Text('Title'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(),
+            ),
+          ],
+        ),
       ),
     );
   }
